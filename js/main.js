@@ -11,7 +11,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const navBtns = document.querySelectorAll('.nav-btn');
   const viewDashboard = document.getElementById('view-dashboard');
   const viewShipments = document.getElementById('view-shipments');
+  const viewDetails = document.getElementById('view-details');
   const newShipmentBtn = document.getElementById('new-shipment-btn');
+
+  let currentActiveShipmentId = null;
 
   if (newShipmentBtn) {
     newShipmentBtn.addEventListener('click', () => {
@@ -32,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       navBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const view = btn.dataset.view;
+      viewDetails.style.display = 'none';
       if (view === 'dashboard') {
         viewDashboard.style.display = 'block';
         viewShipments.style.display = 'none';
@@ -43,6 +47,75 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   });
+
+  async function showDetailsView(shipmentId) {
+    currentActiveShipmentId = shipmentId;
+    try {
+      const shipments = await fetchShipments();
+      const s = shipments.find(item => item.id === shipmentId || item.trackingNumber === shipmentId);
+      if (!s) return;
+
+      viewDashboard.style.display = 'none';
+      viewShipments.style.display = 'none';
+      viewDetails.style.display = 'block';
+
+      document.getElementById('details-title').textContent = `Détails expédition ${s.trackingNumber}`;
+      document.getElementById('details-recipient').textContent = `${s.recipient}`;
+      document.getElementById('details-carrier').textContent = `Transporteur : ${s.carrier}`;
+      document.getElementById('details-priority').textContent = `${s.isPriority ? 'Prioritaire' : 'Standard'}`;
+      document.getElementById('details-date').textContent = `Est. ${s.estDate || '12/12'}`;
+
+      const dot1 = document.getElementById('t-step-1');
+      const dot2 = document.getElementById('t-step-2');
+      const dot3 = document.getElementById('t-step-3');
+      const dot4 = document.getElementById('t-step-4');
+
+      dot1.style.background = '#64b5f6';
+      dot2.style.background = '#e0e0e0';
+      dot3.style.background = '#e0e0e0';
+      dot4.style.background = '#e0e0e0';
+
+      if (s.status === 'IN_TRANSIT') {
+        dot2.style.background = '#64b5f6';
+      } else if (s.status === 'DELAYED') {
+        dot2.style.background = '#e57373';
+      } else if (s.status === 'DELIVERED') {
+        dot2.style.background = '#64b5f6';
+        dot3.style.background = '#64b5f6';
+        dot4.style.background = '#81c784';
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  document.getElementById('details-back-btn').onclick = () => {
+    viewDetails.style.display = 'none';
+    viewShipments.style.display = 'block';
+    loadTableData();
+  };
+
+  document.getElementById('page-edit-btn').onclick = () => {
+    if (currentActiveShipmentId) {
+      openShipmentModal(currentActiveShipmentId, () => {
+        showDetailsView(currentActiveShipmentId);
+        loadTableData();
+      });
+    }
+  };
+
+  document.getElementById('page-delete-btn').onclick = async () => {
+    if (currentActiveShipmentId) {
+      const confirmed = confirm("Êtes-vous sûr de vouloir supprimer cette expédition ?");
+      if (confirmed) {
+        await deleteShipment(currentActiveShipmentId);
+        viewDetails.style.display = 'none';
+        viewShipments.style.display = 'block';
+        loadTableData();
+        loadAndRender();
+      }
+    }
+  };
 
   async function loadAndRender(queryParams = '') {
     try {
@@ -71,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
 
         card.addEventListener('click', () => {
-          openShipmentModal(s.id, () => { loadAndRender(); loadTableData(); });
+          showDetailsView(s.id);
         });
 
         container.appendChild(card);
@@ -93,10 +166,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       shipments.forEach(s => {
         let statusClass = 'status-pending';
-        let statusLabel = 'Pending';
-        if (s.status === 'IN_TRANSIT') { statusClass = 'status-in-transit'; statusLabel = 'In Transit'; }
-        if (s.status === 'DELIVERED') { statusClass = 'status-delivered'; statusLabel = 'Delivered'; }
-        if (s.status === 'DELAYED') { statusClass = 'status-delayed'; statusLabel = 'Delayed'; }
+        let statusLabel = 'En attente';
+        if (s.status === 'IN_TRANSIT') { statusClass = 'status-in-transit'; statusLabel = 'En transit'; }
+        if (s.status === 'DELIVERED') { statusClass = 'status-delivered'; statusLabel = 'Livré'; }
+        if (s.status === 'DELAYED') { statusClass = 'status-delayed'; statusLabel = 'Retard'; }
 
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -105,24 +178,24 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
           <td>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-action view-btn" title="View Details" style="background: #e3f2fd; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🔍</button>
-              <button class="btn-action edit-btn" title="Edit" style="background: #fff9c4; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">✏️</button>
-              <button class="btn-action delete-btn" title="Delete" style="background: #ffcdd2; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🗑️</button>
+              <button class="btn-action view-btn" title="Voir les détails" style="background: #e3f2fd; border: 1.5px solid #000; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: monospace;">▢</button>
+              <button class="btn-action edit-btn" title="Modifier" style="background: #fff9c4; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">✏️</button>
+              <button class="btn-action delete-btn" title="Supprimer" style="background: #ffcdd2; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🗑️</button>
             </div>
           </td>
         `;
 
         row.querySelector('.view-btn').onclick = (e) => {
           e.stopPropagation();
-          openShipmentModal(s.id, () => { loadAndRender(); loadTableData(); });
+          showDetailsView(s.id);
         };
         row.querySelector('.edit-btn').onclick = (e) => {
           e.stopPropagation();
-          openShipmentModal(s.id, () => { loadAndRender(); loadTableData(); });
+          openShipmentModal(s.id, () => { loadTableData(); loadAndRender(); });
         };
         row.querySelector('.delete-btn').onclick = async (e) => {
           e.stopPropagation();
-          const confirmed = confirm("Are you sure you want to delete this shipment?");
+          const confirmed = confirm("Êtes-vous sûr de vouloir supprimer cette expédition ?");
           if (confirmed) {
             await deleteShipment(s.id);
             loadAndRender();
