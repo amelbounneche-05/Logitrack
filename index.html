@@ -8,17 +8,21 @@
 </head>
 <body>
   <div class="app-layout">
-    <!-- Sidebar with clickable brand logo -->
+    <!-- Sidebar with attractive compact layout -->
     <aside class="sidebar">
       <div id="home-logo" class="logo-container" style="cursor: pointer;">
-        <img src="./assets/logo_logitrack.png" alt="LogiTrack" style="width: 100%; max-height: 60px; object-fit: contain;">
+        <img src="./assets/logo_logitrack.png" alt="LogiTrack">
+        <span class="sidebar-badge">Logistics Hub</span>
       </div>
       
       <nav class="nav-menu">
         <button type="button" class="nav-btn" data-view="dashboard">Tableau de bord</button>
         <button type="button" class="nav-btn active" data-view="shipments">Expéditions</button>
       </nav>
-      <button type="button" id="reset-data-btn" class="btn-reset">Réinitialiser les données</button>
+
+      <div class="sidebar-footer">
+        <button type="button" id="reset-data-btn" class="btn-reset">Réinitialiser les données</button>
+      </div>
     </aside>
 
     <!-- Main Content Wrapper -->
@@ -96,7 +100,7 @@
                 <option value="PENDING">En attente</option>
               </select>
             </div>
-            <button id="new-shipment-btn" style="background: #e1bee7; border: 2px solid #000; border-radius: 8px; padding: 8px 15px; font-weight: bold; cursor: pointer;">+ Nouvelle expédition</button>
+            <button id="new-shipment-btn" style="background: #e1bee7; border: 2px solid #000; border-radius: 8px; padding: 8px 15px; font-weight: bold; cursor: pointer; box-shadow: 2px 2px 0px #000;">+ Nouvelle expédition</button>
           </div>
 
           <table class="shipments-table">
@@ -112,14 +116,13 @@
           </table>
         </section>
 
-        <!-- DETAILS PAGE VIEW (Matching Mockup) -->
+        <!-- DETAILS PAGE VIEW -->
         <section id="view-details" class="view-section" style="display: none;">
           <div style="margin-bottom: 15px;">
             <button id="details-back-btn" style="background: none; border: none; font-weight: bold; cursor: pointer; font-size: 16px;">← Retour</button>
           </div>
           <h2 id="details-title" style="margin-bottom: 25px;">Détails expédition</h2>
           
-          <!-- Timeline Progress -->
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 35px; max-width: 650px;">
             <div style="text-align: center;">
               <div id="t-step-1" style="width: 26px; height: 26px; border-radius: 50%; background: #64b5f6; border: 2px solid #000; margin: 0 auto 8px;"></div>
@@ -139,7 +142,6 @@
             </div>
           </div>
 
-          <!-- Info Box -->
           <div style="border: 2px solid #000; border-radius: 12px; padding: 25px; max-width: 550px; background: #fff; margin-bottom: 30px; box-shadow: 4px 4px 0px #000;">
             <p id="details-recipient" style="font-size: 16px; margin-bottom: 12px; font-weight: bold;"></p>
             <p id="details-carrier" style="font-size: 16px; margin-bottom: 12px;"></p>
@@ -147,7 +149,6 @@
             <p id="details-date" style="font-size: 16px;"></p>
           </div>
 
-          <!-- Action Buttons -->
           <div style="display: flex; gap: 15px;">
             <button id="page-edit-btn" style="background: #c8e6c9; border: 2px solid #000; border-radius: 8px; padding: 10px 25px; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0px #000;">Modifier</button>
             <button id="page-delete-btn" style="background: #ffcdd2; border: 2px solid #000; border-radius: 8px; padding: 10px 25px; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0px #000;">Supprimer</button>
