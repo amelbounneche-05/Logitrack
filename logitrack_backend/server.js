@@ -26,16 +26,17 @@ app.get('/api/v1/shipments', (req, res) => {
 });
 
 app.get('/api/v1/shipments/:id', (req, res) => {
-  const item = shipments.find(s => s.id === req.params.id);
+  const item = shipments.find(s => s.id === req.params.id || s.trackingNumber === req.params.id);
   if (!item) return res.status(404).json({ error: "Shipment not found" });
   res.json(item);
 });
 
 app.post('/api/v1/shipments', (req, res) => {
   const { trackingNumber, recipient, carrier, status, isPriority, estDate, internalNotes } = req.body;
+  const newId = trackingNumber || `LT-${Math.floor(10000 + Math.random() * 90000)}`;
   const newShipment = {
-    id: trackingNumber || `LT-${Math.floor(10000 + Math.random() * 90000)}`,
-    trackingNumber: trackingNumber || `LT-${Math.floor(10000 + Math.random() * 90000)}`,
+    id: newId,
+    trackingNumber: newId,
     recipient: recipient || 'New Recipient',
     carrier: carrier || 'DHL',
     status: status || 'PENDING',
@@ -48,7 +49,7 @@ app.post('/api/v1/shipments', (req, res) => {
 });
 
 app.put('/api/v1/shipments/:id', (req, res) => {
-  const item = shipments.find(s => s.id === req.params.id);
+  const item = shipments.find(s => s.id === req.params.id || s.trackingNumber === req.params.id);
   if (!item) return res.status(404).json({ error: "Shipment not found" });
   
   const { status, isPriority, internalNotes, recipient, carrier } = req.body;
@@ -62,8 +63,10 @@ app.put('/api/v1/shipments/:id', (req, res) => {
 });
 
 app.delete('/api/v1/shipments/:id', (req, res) => {
-  const index = shipments.findIndex(s => s.id === req.params.id);
+  const targetId = req.params.id;
+  const index = shipments.findIndex(s => s.id === targetId || s.trackingNumber === targetId);
   if (index === -1) return res.status(404).json({ error: "Shipment not found" });
+  
   const deleted = shipments.splice(index, 1);
   res.json(deleted[0]);
 });
