@@ -7,7 +7,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('shipments-container');
   const tableBody = document.getElementById('shipments-table-body');
   const searchInput = document.getElementById('search-input');
-  const filterStatus = document.getElementById('filter-status-dash');
+  const filterStatusDash = document.getElementById('filter-status-dash');
+  const filterCarrierDash = document.getElementById('filter-carrier-dash');
+  const filterStatusTable = document.getElementById('filter-status-table');
+  const filterCarrierTable = document.getElementById('filter-carrier-table');
   
   const navBtns = document.querySelectorAll('.nav-btn');
   const viewDashboard = document.getElementById('view-dashboard');
@@ -20,6 +23,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let currentActiveShipmentId = null;
   let currentLang = localStorage.getItem('logitrack_lang') || 'fr';
+
+  // Restauration des filtres depuis le localStorage
+  const savedStatus = localStorage.getItem('logitrack_filter_status') || 'ALL';
+  const savedCarrier = localStorage.getItem('logitrack_filter_carrier') || 'ALL';
+  const savedActiveView = localStorage.getItem('logitrack_view') || 'shipments';
+
+  if (filterStatusDash) filterStatusDash.value = savedStatus;
+  if (filterStatusTable) filterStatusTable.value = savedStatus;
+  if (filterCarrierDash) filterCarrierDash.value = savedCarrier;
+  if (filterCarrierTable) filterCarrierTable.value = savedCarrier;
 
   if (langSelect) {
     langSelect.value = currentLang;
@@ -45,7 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Thème Sombre / Clair
+  // Gestion du Thème
   if (themeToggleBtn) {
     const savedTheme = localStorage.getItem('logitrack_theme') || 'light';
     if (savedTheme === 'dark') {
@@ -57,7 +70,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     themeToggleBtn.addEventListener('click', () => {
       const isDark = document.body.classList.contains('dark-theme');
-      const t = translations[currentLang];
       if (isDark) {
         document.body.classList.replace('dark-theme', 'light-theme');
         themeToggleBtn.textContent = '🌙 ' + (currentLang === 'fr' ? 'Mode Sombre' : 'Dark Mode');
@@ -69,6 +81,40 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   }
+
+  // Restauration de la vue active
+  navBtns.forEach(btn => {
+    if (btn.dataset.view === savedActiveView) {
+      navBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (savedActiveView === 'dashboard') {
+        viewDashboard.style.display = 'block';
+        viewShipments.style.display = 'none';
+        loadAndRender();
+      } else {
+        viewDashboard.style.display = 'none';
+        viewShipments.style.display = 'block';
+        loadTableData();
+      }
+    }
+
+    btn.addEventListener('click', () => {
+      navBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const view = btn.dataset.view;
+      localStorage.setItem('logitrack_view', view);
+      viewDetails.style.display = 'none';
+      if (view === 'dashboard') {
+        viewDashboard.style.display = 'block';
+        viewShipments.style.display = 'none';
+        loadAndRender();
+      } else {
+        viewDashboard.style.display = 'none';
+        viewShipments.style.display = 'block';
+        loadTableData();
+      }
+    });
+  });
 
   if (newShipmentBtn) {
     newShipmentBtn.addEventListener('click', () => {
@@ -105,12 +151,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         viewDetails.style.display = 'none';
         viewShipments.style.display = 'block';
-        const shipmentsBtn = document.querySelector('.nav-btn[data-view="shipments"]');
-        if (shipmentsBtn) {
-          navBtns.forEach(b => b.classList.remove('active'));
-          shipmentsBtn.classList.add('active');
-        }
-
         loadTableData();
         loadAndRender();
         alert(t.reset_success);
@@ -127,24 +167,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (dashboardBtn) dashboardBtn.click();
     });
   }
-
-  navBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      navBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const view = btn.dataset.view;
-      viewDetails.style.display = 'none';
-      if (view === 'dashboard') {
-        viewDashboard.style.display = 'block';
-        viewShipments.style.display = 'none';
-        loadAndRender();
-      } else {
-        viewDashboard.style.display = 'none';
-        viewShipments.style.display = 'block';
-        loadTableData();
-      }
-    });
-  });
 
   async function showDetailsView(shipmentId) {
     currentActiveShipmentId = shipmentId;
@@ -174,9 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       dot3.className = 'timeline-dot';
       dot4.className = 'timeline-dot';
 
-      if (s.status === 'IN_TRANSIT') {
-        dot2.className = 'timeline-dot active';
-      } else if (s.status === 'DELAYED') {
+      if (s.status === 'IN_TRANSIT' || s.status === 'DELAYED') {
         dot2.className = 'timeline-dot active';
       } else if (s.status === 'DELIVERED') {
         dot2.className = 'timeline-dot active';
@@ -219,7 +239,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadAndRender(queryParams = '') {
     try {
-      const shipments = await fetchShipments(queryParams);
+      let query = queryParams;
+      const statusVal = filterStatusDash ? filterStatusDash.value : 'ALL';
+      if (statusVal !== 'ALL' && !query.includes('status=')) {
+        query += (query ? '&' : '?') + `status=${statusVal}`;
+      }
+
+      const shipments = await fetchShipments(query);
       container.innerHTML = '';
       
       if (!shipments || shipments.length === 0) {
@@ -256,7 +282,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   async function loadTableData() {
     try {
-      const shipments = await fetchShipments();
+      let query = '';
+      const statusVal = filterStatusTable ? filterStatusTable.value : 'ALL';
+      const carrierVal = filterCarrierTable ? filterCarrierTable.value : 'ALL';
+
+      if (statusVal !== 'ALL') query += `?status=${statusVal}`;
+      if (carrierVal !== 'ALL') query += (query ? '&' : '?') + `carrier=${carrierVal}`;
+
+      const shipments = await fetchShipments(query);
       tableBody.innerHTML = '';
       
       if (!shipments || shipments.length === 0) {
@@ -311,14 +344,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Écouteurs pour les filtres avec sauvegarde dans le localStorage
+  if (filterStatusDash) {
+    filterStatusDash.addEventListener('change', (e) => {
+      const val = e.target.value;
+      localStorage.setItem('logitrack_filter_status', val);
+      loadAndRender(val !== 'ALL' ? `?status=${val}` : '');
+    });
+  }
+
+  if (filterStatusTable) {
+    filterStatusTable.addEventListener('change', (e) => {
+      const val = e.target.value;
+      localStorage.setItem('logitrack_filter_status', val);
+      loadTableData();
+    });
+  }
+
+  if (filterCarrierTable) {
+    filterCarrierTable.addEventListener('change', (e) => {
+      const val = e.target.value;
+      localStorage.setItem('logitrack_filter_carrier', val);
+      loadTableData();
+    });
+  }
+
   searchInput.addEventListener('input', debounce((e) => {
     loadAndRender(`?search=${encodeURIComponent(e.target.value)}`);
   }, 300));
 
-  filterStatus.addEventListener('change', (e) => {
-    const val = e.target.value;
-    loadAndRender(val !== 'ALL' ? `?status=${val}` : '');
-  });
-
-  loadTableData();
+  if (viewShipments.style.display === 'block') {
+    loadTableData();
+  } else {
+    loadAndRender();
+  }
 });
