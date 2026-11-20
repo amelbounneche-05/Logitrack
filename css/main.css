@@ -1,193 +1,43 @@
-﻿.app-layout {
-  display: grid;
-  grid-template-columns: 240px 1fr;
-  min-height: 100vh;
-}
+﻿* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+body { background-color: #f7f9fc; color: #333; }
+.app-layout { display: grid; grid-template-columns: 260px 1fr; height: 100vh; }
 
-/* Menu latéral bleu clair comme sur ta maquette */
-.sidebar {
-  background-color: #e0f2fe;
-  border-right: 1px solid #bae6fd;
-  padding: 1.5rem 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
+.sidebar { background-color: #e3f2fd; border-right: 2px solid #000; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+.nav-btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; border: 2px solid #000; border-radius: 20px; background: #fff; cursor: pointer; font-weight: bold; text-align: left; }
+.nav-btn.active { background: #ffe082; }
+.btn-reset { padding: 10px; border: 2px solid #000; border-radius: 8px; background: #ffcdd2; cursor: pointer; font-weight: bold; }
 
-.brand h1 {
-  font-size: 1.5rem;
-  color: #0369a1;
-  text-align: center;
-  padding: 0.75rem;
-  border: 2px solid #0284c7;
-  border-radius: 8px;
-  background: #ffffff;
-  margin-bottom: 2rem;
-}
+.main-wrapper { display: flex; flex-direction: column; overflow-y: auto; }
+.topbar { padding: 20px; border-bottom: 2px solid #000; background: #fff; display: flex; justify-content: flex-end; }
+#search-input { width: 350px; padding: 10px; border: 2px solid #000; border-radius: 20px; outline: none; }
+#app-content { padding: 20px; }
 
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-bottom: auto;
-}
+.kpi-container { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+.kpi-card { border: 2px solid #000; border-radius: 12px; padding: 15px; text-align: center; background: #fff; }
+.kpi-transit { background-color: #e3f2fd; }
+.kpi-delivered { background-color: #e8f5e9; }
+.kpi-delayed { background-color: #ffebee; }
+.kpi-pending { background-color: #fff3e0; }
+.kpi-title { font-size: 11px; font-weight: bold; display: block; margin-bottom: 5px; }
+.kpi-number { font-size: 24px; font-weight: bold; display: block; margin-bottom: 5px; }
+.kpi-sub { font-size: 10px; color: #666; }
 
-.nav-btn {
-  padding: 0.75rem 1rem;
-  border: 1px solid #7dd3fc;
-  border-radius: 6px;
-  background: #ffffff;
-  cursor: pointer;
-  font-weight: 600;
-  text-align: left;
-}
+.filters-bar { display: flex; gap: 15px; margin-bottom: 20px; }
+.filters-bar select { padding: 8px 12px; border: 2px solid #000; border-radius: 8px; background: #fff; font-weight: bold; cursor: pointer; }
+.shipments-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.shipment-card { background: #fff; border: 2px solid #000; border-radius: 12px; padding: 15px; cursor: pointer; transition: transform 0.2s; }
+.shipment-card:hover { transform: translateY(-3px); }
 
-.nav-btn.active {
-  background-color: #38bdf8;
-  color: #ffffff;
-  border-color: #0284c7;
-}
+.shipments-table { width: 100%; border-collapse: collapse; background: #fff; border: 2px solid #000; border-radius: 8px; overflow: hidden; }
+.shipments-table th, .shipments-table td { padding: 12px 15px; border-bottom: 1px solid #000; text-align: left; }
+.shipments-table th { background: #f1f3f5; border-bottom: 2px solid #000; font-weight: bold; }
 
-.btn-reset {
-  width: 100%;
-  padding: 0.6rem;
-  background: transparent;
-  border: 1px dashed #64748b;
-  border-radius: 6px;
-  color: #475569;
-  cursor: pointer;
-  font-size: 0.85rem;
-}
+.status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; border: 1.5px solid #000; }
+.status-in-transit { background-color: #bbdefb; color: #0d47a1; }
+.status-delivered { background-color: #c8e6c9; color: #1b5e20; }
+.status-delayed { background-color: #ffcdd2; color: #b71c1c; }
+.status-pending { background-color: #ffe0b2; color: #e65100; }
 
-/* Zone principale */
-.main-wrapper {
-  display: flex;
-  flex-direction: column;
-}
-
-.topbar {
-  background: #ffffff;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.search-box input {
-  width: 100%;
-  max-width: 450px;
-  padding: 0.6rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 20px;
-}
-
-.content {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.btn-primary {
-  background-color: #0284c7;
-  color: #ffffff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* Grille des 4 KPIs */
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-}
-
-.kpi-card {
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 1rem;
-  border: 2px solid #cbd5e1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.kpi-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  color: #ffffff;
-  text-align: center;
-}
-
-.kpi-value {
-  font-size: 2rem;
-  text-align: center;
-}
-
-/* Codes couleurs officiels imposés */
-.status-in-transit { border-color: #2563eb; }
-.status-in-transit .kpi-label { background-color: #2563eb; }
-
-.status-delivered { border-color: #16a34a; }
-.status-delivered .kpi-label { background-color: #16a34a; }
-
-.status-delayed { border-color: #dc2626; }
-.status-delayed .kpi-label { background-color: #dc2626; }
-
-.status-pending { border-color: #ea580c; }
-.status-pending .kpi-label { background-color: #ea580c; }
-
-/* Filtres */
-.filters-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.filters-bar select {
-  padding: 0.5rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  background: #ffffff;
-}
-
-/* Grille des cartes */
-.shipments-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-.state-message {
-  padding: 2rem;
-  text-align: center;
-  background: #ffffff;
-  border-radius: 8px;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Responsive mobile/tablette */
-@media (max-width: 768px) {
-  .app-layout {
-    grid-template-columns: 1fr;
-  }
-  .sidebar {
-    flex-direction: row;
-    align-items: center;
-    padding: 1rem;
-  }
-  .brand h1 { margin-bottom: 0; font-size: 1.2rem; }
-  .sidebar-nav { flex-direction: row; margin: 0; }
-}
+.btn-primary { background: #e0f7fa; border: 2px solid #000; border-radius: 8px; padding: 8px 15px; font-weight: bold; cursor: pointer; }
+dialog { border: 2px solid #000; border-radius: 12px; padding: 20px; background: #fff; margin: auto; max-width: 400px; width: 100%; }
+dialog::backdrop { background: rgba(0,0,0,0.4); }

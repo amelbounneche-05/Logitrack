@@ -3,103 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LogiTrack - Tableau de bord</title>
-  <link rel="stylesheet" href="./css/reset.css">
+  <title>LogiTrack — Tableau de bord</title>
   <link rel="stylesheet" href="./css/main.css">
-  <link rel="stylesheet" href="./css/components.css">
-  <script type="module" src="./js/main.js"></script>
 </head>
 <body>
   <div class="app-layout">
-    <!-- Menu latéral (comme sur ta maquette) -->
+    <!-- Barre latérale avec logo cliquable -->
     <aside class="sidebar">
-      <div class="brand">
-        <h1>Logitrack</h1>
+      <div id="home-logo" class="logo-container" style="cursor: pointer; text-align: center; margin-bottom: 20px;">
+        <img src="./assets/logo_logitrack.png" alt="LogiTrack" style="width: 100%; max-height: 60px; object-fit: contain;">
       </div>
-      <nav class="sidebar-nav">
+      
+      <nav class="nav-menu">
         <button type="button" class="nav-btn active" data-view="dashboard">Tableau de bord</button>
         <button type="button" class="nav-btn" data-view="shipments">Expéditions</button>
       </nav>
-      <div class="sidebar-footer">
-        <button type="button" id="btn-reset" class="btn-reset">Réinitialiser les données</button>
-      </div>
+      <button type="button" id="reset-data-btn" class="btn-reset">Réinitialiser les données</button>
     </aside>
 
-    <!-- Zone principale -->
+    <!-- Contenu principal -->
     <div class="main-wrapper">
-      <!-- En-tête avec barre de recherche globale -->
       <header class="topbar">
-        <div class="search-box">
-          <input type="search" id="search-input" placeholder="Rechercher un n° de suivi ou un destinataire..." aria-label="Rechercher une expédition">
-        </div>
+        <input type="search" id="search-input" placeholder="Rechercher un n° de suivi ou un destinataire...">
       </header>
 
-      <main class="content">
-        <div class="page-header">
+      <main id="app-content">
+        <!-- VUE TABLEAU DE BORD -->
+        <section id="view-dashboard" class="view-section active">
           <h2>Tableau de bord</h2>
-          <button type="button" id="btn-new-shipment" class="btn-primary">+ Nouvelle expédition</button>
-        </div>
+          
+          <div class="kpi-container">
+            <div class="kpi-card kpi-transit">
+              <span class="kpi-title">EN TRANSIT</span>
+              <span class="kpi-number" id="count-transit">48</span>
+              <span class="kpi-sub">Chiffre clé</span>
+            </div>
+            <div class="kpi-card kpi-delivered">
+              <span class="kpi-title">LIVRÉ</span>
+              <span class="kpi-number" id="count-delivered">156</span>
+              <span class="kpi-sub">Chiffre clé</span>
+            </div>
+            <div class="kpi-card kpi-delayed">
+              <span class="kpi-title">RETARD</span>
+              <span class="kpi-number" id="count-delayed">7</span>
+              <span class="kpi-sub">Chiffre clé</span>
+            </div>
+            <div class="kpi-card kpi-pending">
+              <span class="kpi-title">EN ATTENTE</span>
+              <span class="kpi-number" id="count-pending">21</span>
+              <span class="kpi-sub">Chiffre clé</span>
+            </div>
+          </div>
 
-        <!-- Les 4 compteurs KPI de ta maquette -->
-        <section class="kpi-grid" aria-label="Statistiques des expéditions">
-          <article class="kpi-card status-in-transit">
-            <span class="kpi-label">EN TRANSIT</span>
-            <strong class="kpi-value" id="kpi-in-transit">0</strong>
-          </article>
-          <article class="kpi-card status-delivered">
-            <span class="kpi-label">LIVRÉ</span>
-            <strong class="kpi-value" id="kpi-delivered">0</strong>
-          </article>
-          <article class="kpi-card status-delayed">
-            <span class="kpi-label">RETARD</span>
-            <strong class="kpi-value" id="kpi-delayed">0</strong>
-          </article>
-          <article class="kpi-card status-pending">
-            <span class="kpi-label">EN ATTENTE</span>
-            <strong class="kpi-value" id="kpi-pending">0</strong>
-          </article>
+          <div class="filters-bar">
+            <select id="filter-carrier-dash">
+              <option value="ALL">Transporteur : Tous</option>
+              <option value="DHL">DHL</option>
+              <option value="Chronopost">Chronopost</option>
+              <option value="Colissimo">Colissimo</option>
+            </select>
+            <select id="filter-status-dash">
+              <option value="ALL">Statut : Tous</option>
+              <option value="IN_TRANSIT">En transit</option>
+              <option value="DELIVERED">Livré</option>
+              <option value="DELAYED">Retard</option>
+              <option value="PENDING">En attente</option>
+            </select>
+          </div>
+
+          <div id="shipments-container" class="shipments-grid"></div>
         </section>
 
-        <!-- Barre de filtres et tri -->
-        <section class="filters-bar" aria-label="Filtres et tri">
-          <select id="filter-carrier" aria-label="Filtrer par transporteur">
-            <option value="">Transporteur : Tous</option>
-            <option value="DHL">DHL</option>
-            <option value="Chronopost">Chronopost</option>
-            <option value="UPS">UPS</option>
-            <option value="Colissimo">Colissimo</option>
-          </select>
-
-          <select id="filter-status" aria-label="Filtrer par statut">
-            <option value="">Statut : Tous</option>
-            <option value="IN_TRANSIT">En transit</option>
-            <option value="DELIVERED">Livré</option>
-            <option value="DELAYED">Retard</option>
-            <option value="PENDING">En attente</option>
-          </select>
-
-          <select id="sort-by" aria-label="Trier les expéditions">
-            <option value="date">Tri : Date estimée</option>
-            <option value="priority">Tri : Prioritaires d'abord</option>
-          </select>
+        <!-- VUE EXPEDITIONS (Tableau) -->
+        <section id="view-shipments" class="view-section" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Expéditions</h2>
+          </div>
+          
+          <table class="shipments-table">
+            <thead>
+              <tr>
+                <th>N°</th>
+                <th>Transporteurs</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="shipments-table-body"></tbody>
+          </table>
         </section>
-
-        <!-- Zones d'état réseau (Loader / Erreur) -->
-        <div id="loader" class="state-message hidden">Chargement des expéditions...</div>
-        <div id="error-box" class="state-message error hidden">
-          <p id="error-text">Impossible de contacter le serveur.</p>
-          <button type="button" id="btn-retry">Réessayer</button>
-        </div>
-
-        <!-- Grille / Liste des expéditions -->
-        <section id="shipments-container" class="shipments-grid" aria-live="polite"></section>
       </main>
     </div>
   </div>
 
-  <!-- Modale native HTML5 pour le détail et l'édition -->
-  <dialog id="shipment-modal" class="modal">
-    <div class="modal-content" id="modal-body"></div>
-  </dialog>
+  <dialog id="shipment-modal"></dialog>
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>
