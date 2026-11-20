@@ -14,8 +14,30 @@ document.addEventListener('DOMContentLoaded', async () => {
   const viewDetails = document.getElementById('view-details');
   const newShipmentBtn = document.getElementById('new-shipment-btn');
   const resetDataBtn = document.getElementById('reset-data-btn');
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
 
   let currentActiveShipmentId = null;
+
+  // Gestion du Thème Sombre / Clair
+  if (themeToggleBtn) {
+    const savedTheme = localStorage.getItem('logitrack_theme') || 'light';
+    if (savedTheme === 'dark') {
+      document.body.classList.replace('light-theme', 'dark-theme');
+      themeToggleBtn.textContent = '☀️ Mode Jour';
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      if (document.body.classList.contains('dark-theme')) {
+        document.body.classList.replace('dark-theme', 'light-theme');
+        themeToggleBtn.textContent = '🌙 Mode Sombre';
+        localStorage.setItem('logitrack_theme', 'light');
+      } else {
+        document.body.classList.replace('light-theme', 'dark-theme');
+        themeToggleBtn.textContent = '☀️ Mode Jour';
+        localStorage.setItem('logitrack_theme', 'dark');
+      }
+    });
+  }
 
   if (newShipmentBtn) {
     newShipmentBtn.addEventListener('click', () => {
@@ -23,20 +45,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Fonctionnalité du bouton Réinitialiser les données
   if (resetDataBtn) {
     resetDataBtn.addEventListener('click', async () => {
       const confirmed = confirm("Voulez-vous vraiment réinitialiser toutes les données aux valeurs d'origine ?");
       if (!confirmed) return;
 
       try {
-        // On récupère toutes les expéditions actuelles pour les supprimer une par une ou réinitialiser via l'API
         const shipments = await fetchShipments();
         for (const s of shipments) {
           await deleteShipment(s.id);
         }
 
-        // Appel d'une route ou recréation des éléments de base (on poste les éléments initiaux)
         const initialShipments = [
           { trackingNumber: "LT-48213", recipient: "Recipient A - Marseille", carrier: "DHL", status: "IN_TRANSIT", isPriority: true, estDate: "12/12", internalNotes: "Fragile items" },
           { trackingNumber: "LT-48214", recipient: "Recipient B - Lyon", carrier: "Chronopost", status: "DELAYED", isPriority: true, estDate: "10/12", internalNotes: "Weather delay" },
@@ -52,7 +71,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         }
 
-        // Retour à la vue Expéditions et rafraîchissement
         viewDetails.style.display = 'none';
         viewShipments.style.display = 'block';
         const shipmentsBtn = document.querySelector('.nav-btn[data-view="shipments"]');
@@ -119,19 +137,19 @@ document.addEventListener('DOMContentLoaded', async () => {
       const dot3 = document.getElementById('t-step-3');
       const dot4 = document.getElementById('t-step-4');
 
-      dot1.style.background = '#64b5f6';
-      dot2.style.background = '#e0e0e0';
-      dot3.style.background = '#e0e0e0';
-      dot4.style.background = '#e0e0e0';
+      dot1.className = 'timeline-dot active';
+      dot2.className = 'timeline-dot';
+      dot3.className = 'timeline-dot';
+      dot4.className = 'timeline-dot';
 
       if (s.status === 'IN_TRANSIT') {
-        dot2.style.background = '#64b5f6';
+        dot2.className = 'timeline-dot active';
       } else if (s.status === 'DELAYED') {
-        dot2.style.background = '#e57373';
+        dot2.className = 'timeline-dot active';
       } else if (s.status === 'DELIVERED') {
-        dot2.style.background = '#64b5f6';
-        dot3.style.background = '#64b5f6';
-        dot4.style.background = '#81c784';
+        dot2.className = 'timeline-dot active';
+        dot3.className = 'timeline-dot active';
+        dot4.className = 'timeline-dot active';
       }
     } catch (err) {
       console.error(err);
@@ -227,9 +245,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
           <td>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-action view-btn" title="Voir les détails" style="background: #e3f2fd; border: 1.5px solid #000; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: monospace;">▢</button>
-              <button class="btn-action edit-btn" title="Modifier" style="background: #fff9c4; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">✏️</button>
-              <button class="btn-action delete-btn" title="Supprimer" style="background: #ffcdd2; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🗑️</button>
+              <button class="btn-action view-btn" title="Voir les détails" style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--input-border); border-radius: 8px; padding: 6px 12px; cursor: pointer; color: var(--text-main); font-weight: bold;">▢</button>
+              <button class="btn-action edit-btn" title="Modifier" style="background: rgba(234, 179, 8, 0.1); border: 1px solid var(--input-border); border-radius: 8px; padding: 6px 10px; cursor: pointer;">✏️</button>
+              <button class="btn-action delete-btn" title="Supprimer" style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--input-border); border-radius: 8px; padding: 6px 10px; cursor: pointer;">🗑️</button>
             </div>
           </td>
         `;
