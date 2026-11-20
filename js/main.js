@@ -1,4 +1,4 @@
-﻿import { fetchShipments } from './api/shipmentsApi.js';
+﻿import { fetchShipments, deleteShipment } from './api/shipmentsApi.js';
 import { debounce } from './utils/debounce.js';
 import { openShipmentModal } from './components/shipmentModal.js';
 
@@ -107,6 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div style="display: flex; gap: 8px;">
               <button class="btn-action view-btn" title="View Details" style="background: #e3f2fd; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🔍</button>
               <button class="btn-action edit-btn" title="Edit" style="background: #fff9c4; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">✏️</button>
+              <button class="btn-action delete-btn" title="Delete" style="background: #ffcdd2; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🗑️</button>
             </div>
           </td>
         `;
@@ -118,6 +119,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         row.querySelector('.edit-btn').onclick = (e) => {
           e.stopPropagation();
           openShipmentModal(s.id, () => { loadAndRender(); loadTableData(); });
+        };
+        row.querySelector('.delete-btn').onclick = async (e) => {
+          e.stopPropagation();
+          const confirmed = confirm("Are you sure you want to delete this shipment?");
+          if (confirmed) {
+            await deleteShipment(s.id);
+            loadAndRender();
+            loadTableData();
+          }
         };
         
         tableBody.appendChild(row);

@@ -31,3 +31,11 @@ export async function updateShipment(id, data) {
   if (!response.ok) throw new Error("Failed to update shipment");
   return await response.json();
 }
+
+export async function deleteShipment(id) {
+  const response = await fetch(`${API_URL}/shipments/${id}`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) throw new Error("Failed to delete shipment");
+  return await response.json();
+}

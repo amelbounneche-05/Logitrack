@@ -61,6 +61,13 @@ app.put('/api/v1/shipments/:id', (req, res) => {
   res.json(item);
 });
 
+app.delete('/api/v1/shipments/:id', (req, res) => {
+  const index = shipments.findIndex(s => s.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: "Shipment not found" });
+  const deleted = shipments.splice(index, 1);
+  res.json(deleted[0]);
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`LogiTrack server running on http://localhost:${PORT}/api/v1`);
