@@ -1,6 +1,7 @@
 ﻿import { fetchShipments, deleteShipment } from './api/shipmentsApi.js';
 import { debounce } from './utils/debounce.js';
 import { openShipmentModal } from './components/shipmentModal.js';
+import { translations } from './i18n.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('shipments-container');
@@ -15,25 +16,55 @@ document.addEventListener('DOMContentLoaded', async () => {
   const newShipmentBtn = document.getElementById('new-shipment-btn');
   const resetDataBtn = document.getElementById('reset-data-btn');
   const themeToggleBtn = document.getElementById('theme-toggle-btn');
+  const langSelect = document.getElementById('lang-select');
 
   let currentActiveShipmentId = null;
+  let currentLang = localStorage.getItem('logitrack_lang') || 'fr';
 
-  // Gestion du Thème Sombre / Clair
+  if (langSelect) {
+    langSelect.value = currentLang;
+    applyLanguage(currentLang);
+
+    langSelect.addEventListener('change', (e) => {
+      currentLang = e.target.value;
+      localStorage.setItem('logitrack_lang', currentLang);
+      applyLanguage(currentLang);
+      loadTableData();
+      loadAndRender();
+    });
+  }
+
+  function applyLanguage(lang) {
+    const t = translations[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (t[key]) el.textContent = t[key];
+    });
+    if (searchInput) {
+      searchInput.placeholder = t.search_placeholder;
+    }
+  }
+
+  // Thème Sombre / Clair
   if (themeToggleBtn) {
     const savedTheme = localStorage.getItem('logitrack_theme') || 'light';
     if (savedTheme === 'dark') {
       document.body.classList.replace('light-theme', 'dark-theme');
-      themeToggleBtn.textContent = '☀️ Mode Jour';
+      themeToggleBtn.textContent = '☀️ ' + (currentLang === 'fr' ? 'Mode Jour' : 'Light Mode');
+    } else {
+      themeToggleBtn.textContent = '🌙 ' + (currentLang === 'fr' ? 'Mode Sombre' : 'Dark Mode');
     }
 
     themeToggleBtn.addEventListener('click', () => {
-      if (document.body.classList.contains('dark-theme')) {
+      const isDark = document.body.classList.contains('dark-theme');
+      const t = translations[currentLang];
+      if (isDark) {
         document.body.classList.replace('dark-theme', 'light-theme');
-        themeToggleBtn.textContent = '🌙 Mode Sombre';
+        themeToggleBtn.textContent = '🌙 ' + (currentLang === 'fr' ? 'Mode Sombre' : 'Dark Mode');
         localStorage.setItem('logitrack_theme', 'light');
       } else {
         document.body.classList.replace('light-theme', 'dark-theme');
-        themeToggleBtn.textContent = '☀️ Mode Jour';
+        themeToggleBtn.textContent = '☀️ ' + (currentLang === 'fr' ? 'Mode Jour' : 'Light Mode');
         localStorage.setItem('logitrack_theme', 'dark');
       }
     });
@@ -47,7 +78,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (resetDataBtn) {
     resetDataBtn.addEventListener('click', async () => {
-      const confirmed = confirm("Voulez-vous vraiment réinitialiser toutes les données aux valeurs d'origine ?");
+      const t = translations[currentLang];
+      const confirmed = confirm(t.confirm_reset);
       if (!confirmed) return;
 
       try {
@@ -81,10 +113,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         loadTableData();
         loadAndRender();
-        alert("Données réinitialisées avec succès !");
+        alert(t.reset_success);
       } catch (err) {
-        console.error("Erreur lors de la réinitialisation :", err);
-        alert("Erreur lors de la réinitialisation des données.");
+        console.error("Erreur :", err);
       }
     });
   }
@@ -126,10 +157,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       viewShipments.style.display = 'none';
       viewDetails.style.display = 'block';
 
-      document.getElementById('details-title').textContent = `Détails expédition ${s.trackingNumber}`;
+      const t = translations[currentLang];
+      document.getElementById('details-title').textContent = `${t.details_title} ${s.trackingNumber}`;
       document.getElementById('details-recipient').textContent = `${s.recipient}`;
-      document.getElementById('details-carrier').textContent = `Transporteur : ${s.carrier}`;
-      document.getElementById('details-priority').textContent = `${s.isPriority ? 'Prioritaire' : 'Standard'}`;
+      document.getElementById('details-carrier').textContent = (currentLang === 'fr' ? 'Transporteur : ' : 'Carrier: ') + s.carrier;
+      document.getElementById('details-priority').textContent = s.isPriority ? (currentLang === 'fr' ? 'Prioritaire' : 'Priority') : (currentLang === 'fr' ? 'Standard' : 'Standard');
       document.getElementById('details-date').textContent = `Est. ${s.estDate || '12/12'}`;
 
       const dot1 = document.getElementById('t-step-1');
@@ -173,7 +205,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('page-delete-btn').onclick = async () => {
     if (currentActiveShipmentId) {
-      const confirmed = confirm("Êtes-vous sûr de vouloir supprimer cette expédition ?");
+      const t = translations[currentLang];
+      const confirmed = confirm(t.confirm_delete);
       if (confirmed) {
         await deleteShipment(currentActiveShipmentId);
         viewDetails.style.display = 'none';
@@ -190,7 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       container.innerHTML = '';
       
       if (!shipments || shipments.length === 0) {
-        container.innerHTML = '<p>Aucune expédition trouvée.</p>';
+        container.innerHTML = '<p>No shipments found.</p>';
         return;
       }
 
@@ -217,7 +250,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.appendChild(card);
       });
     } catch (err) {
-      container.innerHTML = '<p style="color: red;">Erreur de connexion au serveur backend.</p>';
+      container.innerHTML = '<p style="color: red;">Error connecting to backend server.</p>';
     }
   }
 
@@ -227,16 +260,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       tableBody.innerHTML = '';
       
       if (!shipments || shipments.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Aucune expédition trouvée.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No shipments found.</td></tr>';
         return;
       }
 
       shipments.forEach(s => {
         let statusClass = 'status-pending';
-        let statusLabel = 'En attente';
-        if (s.status === 'IN_TRANSIT') { statusClass = 'status-in-transit'; statusLabel = 'En transit'; }
-        if (s.status === 'DELIVERED') { statusClass = 'status-delivered'; statusLabel = 'Livré'; }
-        if (s.status === 'DELAYED') { statusClass = 'status-delayed'; statusLabel = 'Retard'; }
+        let statusLabel = currentLang === 'fr' ? 'En attente' : 'Pending';
+        if (s.status === 'IN_TRANSIT') { statusClass = 'status-in-transit'; statusLabel = currentLang === 'fr' ? 'En transit' : 'In Transit'; }
+        if (s.status === 'DELIVERED') { statusClass = 'status-delivered'; statusLabel = currentLang === 'fr' ? 'Livré' : 'Delivered'; }
+        if (s.status === 'DELAYED') { statusClass = 'status-delayed'; statusLabel = currentLang === 'fr' ? 'Retard' : 'Delayed'; }
 
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -245,9 +278,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
           <td>
             <div style="display: flex; gap: 8px;">
-              <button class="btn-action view-btn" title="Voir les détails" style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--input-border); border-radius: 8px; padding: 6px 12px; cursor: pointer; color: var(--text-main); font-weight: bold;">▢</button>
-              <button class="btn-action edit-btn" title="Modifier" style="background: rgba(234, 179, 8, 0.1); border: 1px solid var(--input-border); border-radius: 8px; padding: 6px 10px; cursor: pointer;">✏️</button>
-              <button class="btn-action delete-btn" title="Supprimer" style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--input-border); border-radius: 8px; padding: 6px 10px; cursor: pointer;">🗑️</button>
+              <button class="btn-action view-btn" title="Details" style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--input-border); border-radius: 8px; padding: 6px 12px; cursor: pointer; color: var(--text-main); font-weight: bold;">▢</button>
+              <button class="btn-action edit-btn" title="Edit" style="background: rgba(234, 179, 8, 0.1); border: 1px solid var(--input-border); border-radius: 8px; padding: 6px 10px; cursor: pointer;">✏️</button>
+              <button class="btn-action delete-btn" title="Delete" style="background: rgba(239, 68, 68, 0.1); border: 1px solid var(--input-border); border-radius: 8px; padding: 6px 10px; cursor: pointer;">🗑️</button>
             </div>
           </td>
         `;
@@ -262,7 +295,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         row.querySelector('.delete-btn').onclick = async (e) => {
           e.stopPropagation();
-          const confirmed = confirm("Êtes-vous sûr de vouloir supprimer cette expédition ?");
+          const t = translations[currentLang];
+          const confirmed = confirm(t.confirm_delete);
           if (confirmed) {
             await deleteShipment(s.id);
             loadAndRender();
