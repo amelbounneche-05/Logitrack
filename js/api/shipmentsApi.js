@@ -12,6 +12,16 @@ export async function fetchShipmentById(id) {
   return await response.json();
 }
 
+export async function createShipment(data) {
+  const response = await fetch(`${API_URL}/shipments`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) throw new Error("Failed to create shipment");
+  return await response.json();
+}
+
 export async function updateShipment(id, data) {
   const response = await fetch(`${API_URL}/shipments/${id}`, {
     method: 'PUT',

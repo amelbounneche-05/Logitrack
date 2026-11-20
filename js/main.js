@@ -11,8 +11,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   const navBtns = document.querySelectorAll('.nav-btn');
   const viewDashboard = document.getElementById('view-dashboard');
   const viewShipments = document.getElementById('view-shipments');
+  const newShipmentBtn = document.getElementById('new-shipment-btn');
 
-  // Handle click on brand logo to return home (dashboard)
+  if (newShipmentBtn) {
+    newShipmentBtn.addEventListener('click', () => {
+      openShipmentModal(null, () => { loadAndRender(); loadTableData(); });
+    });
+  }
+
   const homeLogo = document.getElementById('home-logo');
   if (homeLogo) {
     homeLogo.addEventListener('click', () => {
@@ -21,7 +27,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  // Handle sidebar navigation between views
   navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       navBtns.forEach(b => b.classList.remove('active'));
@@ -39,7 +44,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Fetch and render dashboard grid cards
   async function loadAndRender(queryParams = '') {
     try {
       const shipments = await fetchShipments(queryParams);
@@ -77,7 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Fetch and render shipments table view matching mockup
   async function loadTableData() {
     try {
       const shipments = await fetchShipments();
@@ -104,7 +107,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div style="display: flex; gap: 8px;">
               <button class="btn-action view-btn" title="View Details" style="background: #e3f2fd; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🔍</button>
               <button class="btn-action edit-btn" title="Edit" style="background: #fff9c4; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">✏️</button>
-              <button class="btn-action delete-btn" title="Delete" style="background: #ffcdd2; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🗑️</button>
             </div>
           </td>
         `;
@@ -125,12 +127,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Search input event listener with debounce
   searchInput.addEventListener('input', debounce((e) => {
     loadAndRender(`?search=${encodeURIComponent(e.target.value)}`);
   }, 300));
 
-  // Status filter event listener
   filterStatus.addEventListener('change', (e) => {
     const val = e.target.value;
     loadAndRender(val !== 'ALL' ? `?status=${val}` : '');
