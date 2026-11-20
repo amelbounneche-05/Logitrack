@@ -122,8 +122,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const shipments = await fetchShipments(queryParams);
       container.innerHTML = '';
       
-      if (shipments.length === 0) {
-        container.innerHTML = '<p>No shipments found.</p>';
+      if (!shipments || shipments.length === 0) {
+        container.innerHTML = '<p>Aucune expédition trouvée.</p>';
         return;
       }
 
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.appendChild(card);
       });
     } catch (err) {
-      container.innerHTML = '<p style="color: red;">Error connecting to backend server.</p>';
+      container.innerHTML = '<p style="color: red;">Erreur de connexion au serveur backend.</p>';
     }
   }
 
@@ -159,8 +159,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       const shipments = await fetchShipments();
       tableBody.innerHTML = '';
       
-      if (shipments.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No shipments found.</td></tr>';
+      if (!shipments || shipments.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Aucune expédition trouvée.</td></tr>';
         return;
       }
 

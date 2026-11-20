@@ -15,59 +15,59 @@
       </div>
       
       <nav class="nav-menu">
-        <button type="button" class="nav-btn" data-view="dashboard">Dashboard</button>
-        <button type="button" class="nav-btn active" data-view="shipments">Shipments</button>
+        <button type="button" class="nav-btn" data-view="dashboard">Tableau de bord</button>
+        <button type="button" class="nav-btn active" data-view="shipments">Expéditions</button>
       </nav>
-      <button type="button" id="reset-data-btn" class="btn-reset">Reset Data</button>
+      <button type="button" id="reset-data-btn" class="btn-reset">Réinitialiser les données</button>
     </aside>
 
     <!-- Main Content Wrapper -->
     <div class="main-wrapper">
       <header class="topbar">
-        <input type="search" id="search-input" placeholder="Search by tracking number or recipient...">
+        <input type="search" id="search-input" placeholder="Rechercher un n° de suivi ou un destinataire...">
       </header>
 
       <main id="app-content">
         <!-- DASHBOARD VIEW -->
         <section id="view-dashboard" class="view-section" style="display: none;">
-          <h2>Dashboard</h2>
+          <h2>Tableau de bord</h2>
           
           <div class="kpi-container">
             <div class="kpi-card kpi-transit">
-              <span class="kpi-title">IN TRANSIT</span>
+              <span class="kpi-title">EN TRANSIT</span>
               <span class="kpi-number" id="count-transit">48</span>
-              <span class="kpi-sub">Key metric</span>
+              <span class="kpi-sub">Métrique clé</span>
             </div>
             <div class="kpi-card kpi-delivered">
-              <span class="kpi-title">DELIVERED</span>
+              <span class="kpi-title">LIVRÉ</span>
               <span class="kpi-number" id="count-delivered">156</span>
-              <span class="kpi-sub">Key metric</span>
+              <span class="kpi-sub">Métrique clé</span>
             </div>
             <div class="kpi-card kpi-delayed">
-              <span class="kpi-title">DELAYED</span>
+              <span class="kpi-title">RETARD</span>
               <span class="kpi-number" id="count-delayed">7</span>
-              <span class="kpi-sub">Key metric</span>
+              <span class="kpi-sub">Métrique clé</span>
             </div>
             <div class="kpi-card kpi-pending">
-              <span class="kpi-title">PENDING</span>
+              <span class="kpi-title">EN ATTENTE</span>
               <span class="kpi-number" id="count-pending">21</span>
-              <span class="kpi-sub">Key metric</span>
+              <span class="kpi-sub">Métrique clé</span>
             </div>
           </div>
 
           <div class="filters-bar">
             <select id="filter-carrier-dash">
-              <option value="ALL">Carrier: All</option>
+              <option value="ALL">Transport: Tous</option>
               <option value="DHL">DHL</option>
               <option value="Chronopost">Chronopost</option>
               <option value="Colissimo">Colissimo</option>
             </select>
             <select id="filter-status-dash">
-              <option value="ALL">Status: All</option>
-              <option value="IN_TRANSIT">In Transit</option>
-              <option value="DELIVERED">Delivered</option>
-              <option value="DELAYED">Delayed</option>
-              <option value="PENDING">Pending</option>
+              <option value="ALL">Statut: Tous</option>
+              <option value="IN_TRANSIT">En transit</option>
+              <option value="DELIVERED">Livré</option>
+              <option value="DELAYED">Retard</option>
+              <option value="PENDING">En attente</option>
             </select>
           </div>
 
@@ -77,39 +77,81 @@
         <!-- SHIPMENTS VIEW -->
         <section id="view-shipments" class="view-section" style="display: block;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Shipments</h2>
+            <h2>Expéditions</h2>
           </div>
           
           <div class="filters-bar" style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; gap: 15px;">
               <select id="filter-carrier-table">
-                <option value="ALL">Carrier: All</option>
+                <option value="ALL">Transport: Tous</option>
                 <option value="DHL">DHL</option>
                 <option value="Chronopost">Chronopost</option>
                 <option value="Colissimo">Colissimo</option>
               </select>
               <select id="filter-status-table">
-                <option value="ALL">Status: All</option>
-                <option value="IN_TRANSIT">In Transit</option>
-                <option value="DELIVERED">Delivered</option>
-                <option value="DELAYED">Delayed</option>
-                <option value="PENDING">Pending</option>
+                <option value="ALL">Statut: Tous</option>
+                <option value="IN_TRANSIT">En transit</option>
+                <option value="DELIVERED">Livré</option>
+                <option value="DELAYED">Retard</option>
+                <option value="PENDING">En attente</option>
               </select>
             </div>
-            <button id="new-shipment-btn" style="background: #e1bee7; border: 2px solid #000; border-radius: 8px; padding: 8px 15px; font-weight: bold; cursor: pointer;">+ New Shipment</button>
+            <button id="new-shipment-btn" style="background: #e1bee7; border: 2px solid #000; border-radius: 8px; padding: 8px 15px; font-weight: bold; cursor: pointer;">+ Nouvelle expédition</button>
           </div>
 
           <table class="shipments-table">
             <thead>
               <tr>
-                <th>Tracking #</th>
-                <th>Carrier & Recipient</th>
-                <th>Status</th>
+                <th>N°</th>
+                <th>Transporteurs</th>
+                <th>Statut</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody id="shipments-table-body"></tbody>
           </table>
+        </section>
+
+        <!-- DETAILS PAGE VIEW (Matching Mockup) -->
+        <section id="view-details" class="view-section" style="display: none;">
+          <div style="margin-bottom: 15px;">
+            <button id="details-back-btn" style="background: none; border: none; font-weight: bold; cursor: pointer; font-size: 16px;">← Retour</button>
+          </div>
+          <h2 id="details-title" style="margin-bottom: 25px;">Détails expédition</h2>
+          
+          <!-- Timeline Progress -->
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 35px; max-width: 650px;">
+            <div style="text-align: center;">
+              <div id="t-step-1" style="width: 26px; height: 26px; border-radius: 50%; background: #64b5f6; border: 2px solid #000; margin: 0 auto 8px;"></div>
+              <span style="font-size: 14px; font-weight: bold;">Commande reçue</span>
+            </div>
+            <div style="text-align: center;">
+              <div id="t-step-2" style="width: 26px; height: 26px; border-radius: 50%; background: #e0e0e0; border: 2px solid #000; margin: 0 auto 8px;"></div>
+              <span style="font-size: 14px; font-weight: bold;">En transit</span>
+            </div>
+            <div style="text-align: center;">
+              <div id="t-step-3" style="width: 26px; height: 26px; border-radius: 50%; background: #e0e0e0; border: 2px solid #000; margin: 0 auto 8px;"></div>
+              <span style="font-size: 14px; font-weight: bold;">En livraison</span>
+            </div>
+            <div style="text-align: center;">
+              <div id="t-step-4" style="width: 26px; height: 26px; border-radius: 50%; background: #e0e0e0; border: 2px solid #000; margin: 0 auto 8px;"></div>
+              <span style="font-size: 14px; font-weight: bold;">Livré</span>
+            </div>
+          </div>
+
+          <!-- Info Box -->
+          <div style="border: 2px solid #000; border-radius: 12px; padding: 25px; max-width: 550px; background: #fff; margin-bottom: 30px; box-shadow: 4px 4px 0px #000;">
+            <p id="details-recipient" style="font-size: 16px; margin-bottom: 12px; font-weight: bold;"></p>
+            <p id="details-carrier" style="font-size: 16px; margin-bottom: 12px;"></p>
+            <p id="details-priority" style="font-size: 16px; margin-bottom: 12px;"></p>
+            <p id="details-date" style="font-size: 16px;"></p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div style="display: flex; gap: 15px;">
+            <button id="page-edit-btn" style="background: #c8e6c9; border: 2px solid #000; border-radius: 8px; padding: 10px 25px; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0px #000;">Modifier</button>
+            <button id="page-delete-btn" style="background: #ffcdd2; border: 2px solid #000; border-radius: 8px; padding: 10px 25px; font-weight: bold; cursor: pointer; box-shadow: 3px 3px 0px #000;">Supprimer</button>
+          </div>
         </section>
       </main>
     </div>
