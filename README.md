@@ -1,74 +1,70 @@
-# LogiTrack — Tableau de Bord Logistique (Dernier Kilomètre)
+# LogiTrack — Logistics Dashboard (Last Mile)
 
-LogiTrack est une application web moderne et performante conçue pour les coordinateurs d'entrepôt et répartiteurs logistiques. Elle permet de suivre, filtrer, créer, modifier et supprimer des expéditions en temps réel dans le cadre de la distribution urbaine express.
+LogiTrack is a modern, high-performance web application designed for warehouse coordinators and logistics dispatchers. It allows users to track, filter, create, update, and delete shipments in real time for express urban distribution.
 
 ---
 
-## Choix Techniques & Architecture
+## Technical Choices & Architecture
 
-Conformément aux exigences du projet, l'application a été développée **100% en Vanilla JavaScript (ES Modules)**, sans aucun framework UI lourd (pas de React, Vue ou jQuery), garantissant une fluidité maximale sur les terminaux industriels et postes d'atelier légers.
+In accordance with project requirements, the application was built **100% in Vanilla JavaScript (ES Modules)** without heavy UI frameworks (no React, Vue, or jQuery), ensuring maximum performance on industrial terminals and lightweight workstation setups.
 
-L'architecture du projet respecte une structure modulaire stricte :
+The project follows a strict modular structure:
 
 cda-b2-logitrack/
 │
-├── index.html # Point d'entrée HTML5 sémantique (, , etc.)
+├── index.html # Semantic HTML5 entry point (, , etc.)
 ├── css/
-│ └── main.css # Styles CSS purs (Flexbox, Grid, thèmes clair/sombre, variables)
+│ └── main.css # Pure CSS styles (Flexbox, Grid, light/dark themes, variables)
 └── js/
-├── main.js # Point d'entrée principal de l'application
-├── i18n.js # Moteur de traduction multilingue (Français / Anglais)
+├── main.js # Main application entry point
+├── i18n.js # Multilingual translation engine (French / English)
 ├── api/
-│ └── shipmentsApi.js # Appels HTTP asynchrones (GET, POST, PUT, DELETE)
+│ └── shipmentsApi.js # Asynchronous HTTP calls (GET, POST, PUT, DELETE)
 ├── components/
-│ └── shipmentModal.js # Gestion de la modale native
+│ └── shipmentModal.js # Native modal management
 └── utils/
-└── debounce.js # Fonction utilitaire de Debounce pour la recherche
+└── debounce.js # Debounce utility function for search optimization
 
 ---
 
-## Installation et Lancement du Projet
+## Installation and Project Setup
 
-Pour faire fonctionner l'application, vous devez lancer le serveur backend fourni ainsi que l'interface frontend.
+To run the application, you need to start both the provided backend server and the frontend interface.
 
-### 1. Cloner et lancer le Backend
+### 1. Clone and Start the Backend
 
-Le backend Express gère l'API REST et la persistance des données. Ouvrez un premier terminal et exécutez :
+The Express backend manages the REST API and data persistence. Open a terminal and run:
 
 ```bash
-
 git clone [https://github.com/PlateformeProjects/logitrack_backend.git](https://github.com/PlateformeProjects/logitrack_backend.git)
 cd logitrack_backend
 npm install
 node server.js
 
-Le serveur s'exécutera localement sur http://localhost:3000/api/v1.
+The server will run locally at http://localhost:3000/api/v1.
+2. Start the Frontend (This Repository)
 
-2. Lancer le Frontend (Ce dépôt)
-Ouvrez un second terminal dans le dossier de votre projet frontend (cda-b2-logitrack) puis lancez-le via un serveur de développement local (comme l'extension Live Server sur VS Code ou un serveur http) :
+Open a second terminal inside your frontend project folder (cda-b2-logitrack) and serve it using a local development server (such as the Live Server extension in VS Code or an HTTP server):
 Bash
 
-# Exemple avec http-server (si installé globalement) ou via Live Server sur VS Code
-
+# Example using http-server (if installed globally) or via VS Code Live Server
 node server.js
 
-Accédez ensuite à l'application dans votre navigateur à l'adresse indiquée (ex: http://127.0.0.1:5500/index.html).
+Access the application in your web browser at the indicated address (e.g., http://127.0.0.1:5500/index.html).
+Core Concepts Implemented
+1. Manual Debounce (Real-Time Search)
 
-Concepts Clés Implémentés
+To prevent server overloading or filtering on every single keystroke (which would degrade performance on lightweight terminals), a custom higher-order function debounce(fn, delay) was implemented. It delays text search execution by 300 ms after the user's last keystroke using setTimeout and clearTimeout.
+2. Event Delegation
 
-1. Le Debounce Manuel (Recherche Temps Réel)
+To optimize memory usage and avoid attaching individual event listeners to every dynamically generated shipment card, click events are centralized on the parent container. The event.target.closest() method is then used to accurately target the requested action (view, edit, delete).
+3. User Preferences (localStorage)
 
-Pour éviter de saturer le serveur ou de déclencher un filtrage à chaque frappe (ce qui nuirait aux performances sur terminaux légers), une fonction d'ordre supérieur debounce(fn, delay) a été implémentée manuellement. Elle retarde l'exécution de la recherche textuelle de 300 ms après la dernière frappe de l'utilisateur en s'appuyant sur setTimeout et clearTimeout.
+The application automatically remembers user preferences:
 
-2. La Délégation d'Événements
+    Active theme (Dark Mode / Light Mode).
 
-Afin d'optimiser la gestion mémoire et d'éviter d'attacher des écouteurs d'événements individuels sur chaque carte de colis générée dynamiquement, l'écoute des clics est centralisée sur le conteneur parent. La méthode event.target.closest() est ensuite utilisée pour cibler précisément l'action demandée (voir, modifier, supprimer).
+    Interface language (French / English).
 
-3. Préférences Utilisateur (localStorage)
-
-L'application mémorise automatiquement les préférences de l'utilisateur :
-
-    Le thème actif (Mode Sombre / Mode Clair).
-    La langue de l'interface (Français / Anglais).
-    Les derniers filtres appliqués (statut, transporteur) et la vue active pour restaurer l'état exact au rechargement.
+    Recent filters applied (status, carrier) and the active view to restore the exact state upon reloading.
 ```
