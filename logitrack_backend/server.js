@@ -17,7 +17,10 @@ let shipments = [
   { id: "LT-48221", trackingNumber: "LT-48221", recipient: "Recipient I - Lille", carrier: "Colissimo", status: "IN_TRANSIT", isPriority: false, estDate: "16/12", internalNotes: "" },
   { id: "LT-48222", trackingNumber: "LT-48222", recipient: "Recipient J - Montpellier", carrier: "DHL", status: "DELIVERED", isPriority: true, estDate: "07/12", internalNotes: "Express delivery" },
   { id: "LT-48223", trackingNumber: "LT-48223", recipient: "Recipient K - Rennes", carrier: "Chronopost", status: "PENDING", isPriority: false, estDate: "18/12", internalNotes: "" },
-  { id: "LT-48224", trackingNumber: "LT-48224", recipient: "Recipient L - Grenoble", carrier: "Colissimo", status: "IN_TRANSIT", isPriority: true, estDate: "17/12", internalNotes: "Priority handling" }
+  { id: "LT-48224", trackingNumber: "LT-48224", recipient: "Recipient L - Grenoble", carrier: "Colissimo", status: "IN_TRANSIT", isPriority: true, estDate: "17/12", internalNotes: "Priority handling" },
+  { id: "LT-48225", trackingNumber: "LT-48225", recipient: "Recipient M - Rouen", carrier: "DHL", status: "DELIVERED", isPriority: false, estDate: "05/12", internalNotes: "" },
+  { id: "LT-48226", trackingNumber: "LT-48226", recipient: "Recipient N - Toulon", carrier: "Chronopost", status: "IN_TRANSIT", isPriority: false, estDate: "19/12", internalNotes: "" },
+  { id: "LT-48227", trackingNumber: "LT-48227", recipient: "Recipient O - Reims", carrier: "Colissimo", status: "DELAYED", isPriority: true, estDate: "06/12", internalNotes: "Address issue" }
 ];
 
 app.get('/api/v1/shipments', (req, res) => {
