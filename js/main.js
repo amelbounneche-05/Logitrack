@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const viewDashboard = document.getElementById('view-dashboard');
   const viewShipments = document.getElementById('view-shipments');
 
-  // Gestion du logo cliquable (retour accueil)
+  // Handle click on brand logo to return home (dashboard)
   const homeLogo = document.getElementById('home-logo');
   if (homeLogo) {
     homeLogo.addEventListener('click', () => {
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Handle sidebar navigation between views
   navBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       navBtns.forEach(b => b.classList.remove('active'));
@@ -38,13 +39,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  // Fetch and render dashboard grid cards
   async function loadAndRender(queryParams = '') {
     try {
       const shipments = await fetchShipments(queryParams);
       container.innerHTML = '';
       
       if (shipments.length === 0) {
-        container.innerHTML = '<p>Aucune expédition trouvée.</p>';
+        container.innerHTML = '<p>No shipments found.</p>';
         return;
       }
 
@@ -60,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.innerHTML = `
           <h3>${s.trackingNumber}</h3>
           <p>${s.recipient}</p>
-          <p>Transporteur : <strong>${s.carrier}</strong></p>
+          <p>Carrier: <strong>${s.carrier}</strong></p>
           <span class="status-badge ${statusClass}">${s.status}</span>
         `;
 
@@ -71,10 +73,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.appendChild(card);
       });
     } catch (err) {
-      container.innerHTML = '<p style="color: red;">Erreur de connexion au backend.</p>';
+      container.innerHTML = '<p style="color: red;">Error connecting to backend server.</p>';
     }
   }
 
+  // Fetch and render shipments table view
   async function loadTableData() {
     try {
       const shipments = await fetchShipments();
@@ -88,10 +91,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const row = document.createElement('tr');
         row.innerHTML = `
           <td><strong>${s.trackingNumber}</strong></td>
-          <td>${s.recipient} - ${s.carrier}</td>
+          <td>${s.recipient} (${s.carrier})</td>
           <td><span class="status-badge ${statusClass}">${s.status}</span></td>
           <td>
-            <button class="btn-primary" style="padding: 4px 8px; font-size: 12px;">🔍 Voir</button>
+            <button class="btn-primary" style="padding: 4px 8px; font-size: 12px;">🔍 View</button>
           </td>
         `;
         row.onclick = () => openShipmentModal(s.id, () => { loadAndRender(); loadTableData(); });
@@ -102,10 +105,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Search input event listener with debounce
   searchInput.addEventListener('input', debounce((e) => {
     loadAndRender(`?search=${encodeURIComponent(e.target.value)}`);
   }, 300));
 
+  // Status filter event listener
   filterStatus.addEventListener('change', (e) => {
     const val = e.target.value;
     loadAndRender(val !== 'ALL' ? `?status=${val}` : '');

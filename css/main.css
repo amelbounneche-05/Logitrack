@@ -4,13 +4,13 @@ body { background-color: #f7f9fc; color: #333; }
 
 .sidebar { background-color: #e3f2fd; border-right: 2px solid #000; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
 
-/* Décalage léger vers la gauche */
+/* Logo container aligned to the left with padding */
 .logo-container {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  padding-left: 5px; /* Ajuste cette valeur si tu veux le décaler plus ou moins */
+  padding-left: 5px;
 }
 
 .nav-btn { display: block; width: 100%; padding: 12px; margin-bottom: 10px; border: 2px solid #000; border-radius: 20px; background: #fff; cursor: pointer; font-weight: bold; text-align: left; }
