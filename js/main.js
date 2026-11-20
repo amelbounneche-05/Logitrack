@@ -13,12 +13,61 @@ document.addEventListener('DOMContentLoaded', async () => {
   const viewShipments = document.getElementById('view-shipments');
   const viewDetails = document.getElementById('view-details');
   const newShipmentBtn = document.getElementById('new-shipment-btn');
+  const resetDataBtn = document.getElementById('reset-data-btn');
 
   let currentActiveShipmentId = null;
 
   if (newShipmentBtn) {
     newShipmentBtn.addEventListener('click', () => {
       openShipmentModal(null, () => { loadAndRender(); loadTableData(); });
+    });
+  }
+
+  // Fonctionnalité du bouton Réinitialiser les données
+  if (resetDataBtn) {
+    resetDataBtn.addEventListener('click', async () => {
+      const confirmed = confirm("Voulez-vous vraiment réinitialiser toutes les données aux valeurs d'origine ?");
+      if (!confirmed) return;
+
+      try {
+        // On récupère toutes les expéditions actuelles pour les supprimer une par une ou réinitialiser via l'API
+        const shipments = await fetchShipments();
+        for (const s of shipments) {
+          await deleteShipment(s.id);
+        }
+
+        // Appel d'une route ou recréation des éléments de base (on poste les éléments initiaux)
+        const initialShipments = [
+          { trackingNumber: "LT-48213", recipient: "Recipient A - Marseille", carrier: "DHL", status: "IN_TRANSIT", isPriority: true, estDate: "12/12", internalNotes: "Fragile items" },
+          { trackingNumber: "LT-48214", recipient: "Recipient B - Lyon", carrier: "Chronopost", status: "DELAYED", isPriority: true, estDate: "10/12", internalNotes: "Weather delay" },
+          { trackingNumber: "LT-48215", recipient: "Recipient C - Paris", carrier: "Colissimo", status: "PENDING", isPriority: false, estDate: "14/12", internalNotes: "" },
+          { trackingNumber: "LT-48216", recipient: "Recipient D - Nice", carrier: "DHL", status: "DELIVERED", isPriority: false, estDate: "08/12", internalNotes: "Signed by recipient" }
+        ];
+
+        for (const item of initialShipments) {
+          await fetch('http://localhost:3000/api/v1/shipments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+          });
+        }
+
+        // Retour à la vue Expéditions et rafraîchissement
+        viewDetails.style.display = 'none';
+        viewShipments.style.display = 'block';
+        const shipmentsBtn = document.querySelector('.nav-btn[data-view="shipments"]');
+        if (shipmentsBtn) {
+          navBtns.forEach(b => b.classList.remove('active'));
+          shipmentsBtn.classList.add('active');
+        }
+
+        loadTableData();
+        loadAndRender();
+        alert("Données réinitialisées avec succès !");
+      } catch (err) {
+        console.error("Erreur lors de la réinitialisation :", err);
+        alert("Erreur lors de la réinitialisation des données.");
+      }
     });
   }
 
