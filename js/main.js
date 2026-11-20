@@ -77,27 +77,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Fetch and render shipments table view
+  // Fetch and render shipments table view matching mockup
   async function loadTableData() {
     try {
       const shipments = await fetchShipments();
       tableBody.innerHTML = '';
+      
+      if (shipments.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;">No shipments found.</td></tr>';
+        return;
+      }
+
       shipments.forEach(s => {
         let statusClass = 'status-pending';
-        if (s.status === 'IN_TRANSIT') statusClass = 'status-in-transit';
-        if (s.status === 'DELIVERED') statusClass = 'status-delivered';
-        if (s.status === 'DELAYED') statusClass = 'status-delayed';
+        let statusLabel = 'Pending';
+        if (s.status === 'IN_TRANSIT') { statusClass = 'status-in-transit'; statusLabel = 'In Transit'; }
+        if (s.status === 'DELIVERED') { statusClass = 'status-delivered'; statusLabel = 'Delivered'; }
+        if (s.status === 'DELAYED') { statusClass = 'status-delayed'; statusLabel = 'Delayed'; }
 
         const row = document.createElement('tr');
         row.innerHTML = `
           <td><strong>${s.trackingNumber}</strong></td>
-          <td>${s.recipient} (${s.carrier})</td>
-          <td><span class="status-badge ${statusClass}">${s.status}</span></td>
+          <td>${s.recipient} - ${s.carrier}</td>
+          <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
           <td>
-            <button class="btn-primary" style="padding: 4px 8px; font-size: 12px;">🔍 View</button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn-action view-btn" title="View Details" style="background: #e3f2fd; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🔍</button>
+              <button class="btn-action edit-btn" title="Edit" style="background: #fff9c4; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">✏️</button>
+              <button class="btn-action delete-btn" title="Delete" style="background: #ffcdd2; border: 1.5px solid #000; border-radius: 6px; padding: 4px 8px; cursor: pointer;">🗑️</button>
+            </div>
           </td>
         `;
-        row.onclick = () => openShipmentModal(s.id, () => { loadAndRender(); loadTableData(); });
+
+        row.querySelector('.view-btn').onclick = (e) => {
+          e.stopPropagation();
+          openShipmentModal(s.id, () => { loadAndRender(); loadTableData(); });
+        };
+        row.querySelector('.edit-btn').onclick = (e) => {
+          e.stopPropagation();
+          openShipmentModal(s.id, () => { loadAndRender(); loadTableData(); });
+        };
+        
         tableBody.appendChild(row);
       });
     } catch (err) {
@@ -116,5 +136,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadAndRender(val !== 'ALL' ? `?status=${val}` : '');
   });
 
-  loadAndRender();
+  loadTableData();
 });

@@ -15,8 +15,8 @@
       </div>
       
       <nav class="nav-menu">
-        <button type="button" class="nav-btn active" data-view="dashboard">Dashboard</button>
-        <button type="button" class="nav-btn" data-view="shipments">Shipments</button>
+        <button type="button" class="nav-btn" data-view="dashboard">Dashboard</button>
+        <button type="button" class="nav-btn active" data-view="shipments">Shipments</button>
       </nav>
       <button type="button" id="reset-data-btn" class="btn-reset">Reset Data</button>
     </aside>
@@ -29,7 +29,7 @@
 
       <main id="app-content">
         <!-- DASHBOARD VIEW -->
-        <section id="view-dashboard" class="view-section active">
+        <section id="view-dashboard" class="view-section" style="display: none;">
           <h2>Dashboard</h2>
           
           <div class="kpi-container">
@@ -75,11 +75,27 @@
         </section>
 
         <!-- SHIPMENTS VIEW -->
-        <section id="view-shipments" class="view-section" style="display: none;">
+        <section id="view-shipments" class="view-section" style="display: block;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Shipments Management</h2>
+            <h2>Shipments</h2>
           </div>
           
+          <div class="filters-bar">
+            <select id="filter-carrier-table">
+              <option value="ALL">Carrier: All</option>
+              <option value="DHL">DHL</option>
+              <option value="Chronopost">Chronopost</option>
+              <option value="Colissimo">Colissimo</option>
+            </select>
+            <select id="filter-status-table">
+              <option value="ALL">Status: All</option>
+              <option value="IN_TRANSIT">In Transit</option>
+              <option value="DELIVERED">Delivered</option>
+              <option value="DELAYED">Delayed</option>
+              <option value="PENDING">Pending</option>
+            </select>
+          </div>
+
           <table class="shipments-table">
             <thead>
               <tr>
